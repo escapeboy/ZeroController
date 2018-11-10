@@ -1,0 +1,29 @@
+{
+  "name": "escapeboy/zerocontroller",
+  "description": "Laravel ZeroController for faster development",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Nikola Katsarov",
+      "email": "katsarov@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.1",
+    "illuminate/support": "~5.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "ZeroController\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "ZeroController\\ZeroControllerServiceProvider"
+      ]
+    }
+  }
+}
