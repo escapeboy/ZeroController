@@ -32,4 +32,13 @@ trait HelpersTrait
             }
         }
     }
+    
+    public function getRelationships()
+    {
+        if (!$this->relationships) {
+            return [];
+        }
+
+        return $this->relationships;
+    }
 }
