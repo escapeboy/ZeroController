@@ -2,7 +2,7 @@
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use ZeroController\Models\ZeroModel as CustomModel;
+use CustomModel;
 use ZeroController\Responses\ZeroResponse as CustomResponse;
 use ZeroController\Requests\ZeroRequest as CustomRequest;
 use App\Http\Controllers\Controller;
