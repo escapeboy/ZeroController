@@ -2,7 +2,7 @@
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\View;
 
 class ZeroResponse extends Response
@@ -43,9 +43,9 @@ class ZeroResponse extends Response
     }
 
     /**
-     * @return Redirect
+     * @return Redirector
      */
-    public function redirect(): Redirect
+    public function redirect(): Redirector
     {
         return redirect();
     }
