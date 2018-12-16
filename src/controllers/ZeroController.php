@@ -38,7 +38,7 @@ class ZeroController extends Controller
      * @param Request $request
      * @return View|JsonResponse
      */
-    public function list(CustomRequest $request): View
+    public function list(CustomRequest $request)
     {
         $this->model = new $this->model;
         if ($request->has('with')) {
@@ -77,7 +77,7 @@ class ZeroController extends Controller
      * @return View|JsonResponse
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function get(CustomRequest $request, CustomModel $item): View
+    public function get(CustomRequest $request, CustomModel $item)
     {
         $this->authorize($this->policy . 'view', $item);
         if ($request->has('with')) {
@@ -103,7 +103,7 @@ class ZeroController extends Controller
      * @param null|CustomModel $item
      * @return RedirectResponse | JsonResponse
      */
-    public function post(CustomRequest $request, ?CustomModel $item): RedirectResponse
+    public function post(CustomRequest $request, ?CustomModel $item)
     {
         try {
             if (!$item) {
@@ -148,7 +148,7 @@ class ZeroController extends Controller
      * @return RedirectResponse|JsonResponse
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function delete(CustomRequest $request, CustomModel $item): RedirectResponse
+    public function delete(CustomRequest $request, CustomModel $item)
     {
         $this->authorize($this->policy . 'delete', $item);
         try {
