@@ -22,4 +22,14 @@ trait HelpersTrait
              ->save();
         return $this;
     }
+    
+    public function reflection()
+    {
+        if (!is_null($this)) {
+            $class = get_class($this);
+            if (class_exists($class)) {
+                return new \ReflectionClass($class);
+            }
+        }
+    }
 }
