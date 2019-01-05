@@ -10,16 +10,17 @@ class ZeroRequest extends FormRequest implements Request
 
     public $user = null;
 
-    public function __construct(
-        array $query = [],
-        array $request = [],
-        array $attributes = [],
-        array $cookies = [],
-        array $files = [],
-        array $server = [],
-        $content = null
-    ) {
-        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+    public function __construct(\Illuminate\Http\Request $request) {
+
+        parent::__construct(
+                $request->query->all(),
+            (array)$request->post,
+                $request->attributes->all(),
+                $request->cookies->all(),
+                $request->files->all(),
+                $request->server->all(),
+                $request->content
+        );
         $this->user = request()->user();
     }
 
