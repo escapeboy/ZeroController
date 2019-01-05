@@ -3,8 +3,9 @@
 namespace ZeroController\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use ZeroController\Interfaces\Request;
 
-class ZeroRequest extends FormRequest
+class ZeroRequest extends FormRequest implements Request
 {
 
     public $user = null;

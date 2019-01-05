@@ -1,14 +1,14 @@
 <?php namespace ZeroController\Controllers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use CustomModel;
-use ZeroController\Responses\ZeroResponse as CustomResponse;
-use ZeroController\Requests\ZeroRequest as CustomRequest;
+use ZeroController\Interfaces\Response;
+use ZeroController\Models\ZeroModel;
+use ZeroController\Requests\ZeroRequest;
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\View;
+use ZeroController\Responses\ZeroResponse;
 
 class ZeroController extends Controller
 {
@@ -18,29 +18,36 @@ class ZeroController extends Controller
     public $form_view;
     /** @var string $policy */
     public $policy;
-    /** @var Model */
+
+    /** @var Model  */
     public $model;
-    /** @var string $response */
-    public $response = 'ZeroController\Responses\ZeroResponse';
-    /** @var string $request */
-    public $request = 'ZeroController\Requests\ZeroRequest';
-    /** @var array $data */
+
+    /** @var Response */
+    public $response;
+    /** @var Request */
+    public $request;
+
+    /** @var array  */
     public $data = [];
 
-    public function __construct()
-    {
-        class_alias($this->request, 'CustomRequest');
-        class_alias($this->response, 'CustomResponse');
-        class_alias($this->model, 'CustomModel');
+    public function __construct() {
+        if(is_null($this->request)){
+            $this->request = new ZeroRequest();
+        }
+        if(is_null($this->response)){
+            $this->response = new ZeroResponse();
+        }
+        if(is_null($this->model)){
+            $this->model = new ZeroModel();
+        }
     }
 
     /**
-     * @param Request $request
-     * @return View|JsonResponse
+     * @return JsonResponse|mixed
      */
-    public function list(CustomRequest $request)
+    public function list()
     {
-        $this->model = new $this->model;
+        $request = $this->request;
         if ($request->has('with')) {
             $this->model = $this->model->with($request->get('with'));
         }
@@ -56,30 +63,32 @@ class ZeroController extends Controller
         if ($request->wantsJson()) {
             $this->data = $this->model->simplePaginate($request->get('limit', 20));
 
-            return $this->response()->json();
+            return $this->zeroResponse()->json();
         }
         $this->data['items'] = $this->model->paginate($request->get('limit', 20));
 
-        return $this->response()->view($this->list_view);
+        return $this->zeroResponse()->view($this->list_view);
     }
 
     /**
-     * @return CustomResponse
+     * @return Response
      */
-    public function response(): CustomResponse
+    public function zeroResponse(): Response
     {
-        return new CustomResponse($this->data);
+        return new $this->response($this->data);
     }
 
     /**
-     * @param CustomRequest $request
-     * @param CustomModel   $item
-     * @return View|JsonResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @param int $item
+     * @return JsonResponse|mixed
      */
-    public function get(CustomRequest $request, CustomModel $item)
+    public function get(int $item)
     {
+        /** @var Model $item */
+        $item = $this->model->findOrFail($item);
+
         $this->authorize($this->policy . 'view', $item);
+        $request = $this->request;
         if ($request->has('with')) {
             $item->loadMissing($request->get('with'));
         }
@@ -92,23 +101,22 @@ class ZeroController extends Controller
         }
         $this->data['item'] = $item;
         if ($request->wantsJson()) {
-            return $this->response()->json();
+            return $this->zeroResponse()->json();
         }
-
-        return $this->response()->view($this->form_view);
+        return $this->zeroResponse()->view($this->form_view);
     }
 
     /**
-     * @param CustomRequest    $request
-     * @param null|CustomModel $item
-     * @return RedirectResponse | JsonResponse
+     * @param int|null $item
+     * @return RedirectResponse|JsonResponse|RedirectResponse
      */
-    public function post(CustomRequest $request, ?CustomModel $item)
+    public function post(int $item = null)
     {
+        $request = $this->request;
         try {
             if (!$item) {
-                $this->authorize($this->policy . 'create', CustomModel::class);
-                $item = new CustomModel();
+                $this->authorize($this->policy . 'create', $this->model);
+                $item = $this->model;
             }
             $this->authorize($this->policy . 'update', $item);
 
@@ -131,26 +139,27 @@ class ZeroController extends Controller
                 ], 400);
             }
 
-            return $this->response()->redirect()->back()->withInput()->withException($e);
+            return $this->zeroResponse()->redirect()->back()->withInput()->withException($e);
         }
         if ($request->wantsJson()) {
             $this->data['item'] = $item;
 
-            return $this->response()->json($this->data);
+            return $this->zeroResponse()->json();
         }
 
-        return $this->response()->redirect()->back()->with('message', 'Item Saved');
+        return $this->zeroResponse()->redirect()->back()->with('message', 'Item Saved');
     }
 
     /**
-     * @param CustomRequest $request
-     * @param CustomModel   $item
-     * @return RedirectResponse|JsonResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @param int $item
+     * @return RedirectResponse|JsonResponse|RedirectResponse
      */
-    public function delete(CustomRequest $request, CustomModel $item)
+    public function delete(int $item)
     {
+        /** @var Model $item */
+        $item = $this->model->firstOrFail($item);
         $this->authorize($this->policy . 'delete', $item);
+        $request = $this->request;
         try {
             $item->delete();
         } catch (\Exception $e) {
@@ -161,26 +170,27 @@ class ZeroController extends Controller
                 ], 400);
             }
 
-            return $this->response()->redirect()->back()->withInput()->withException($e);
+            return $this->zeroResponse()->redirect()->back()->withInput()->withException($e);
         }
         if ($request->wantsJson()) {
             $this->data = ['message' => 'Item Removed'];
 
-            return $this->response()->json();
+            return $this->zeroResponse()->json();
         }
 
-        return $this->response()->redirect()->back()->with('message', 'Item Removed');
+        return $this->zeroResponse()->redirect()->back()->with('message', 'Item Removed');
     }
 
     /**
-     * @param CustomRequest $request
-     * @param CustomModel   $item
-     * @param               $relation
+     * @param int    $item
+     * @param string $relation
      * @return JsonResponse
      * @throws \Exception
      */
-    public function getRelation(CustomRequest $request, CustomModel $item, $relation): JsonResponse
+    public function getRelation(int $item, string $relation): JsonResponse
     {
+        /** @var Model $item */
+        $item = $this->model->findOrFail($item);
         if (in_array($relation, $item->getRelationships())) {
             return response()->json($item->{$relation});
         }
