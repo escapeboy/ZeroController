@@ -5,7 +5,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\View;
 
-class ZeroResponse extends Response
+class ZeroResponse extends Response implements \ZeroController\Interfaces\Response
 {
 
     public $data = [];
@@ -34,10 +34,7 @@ class ZeroResponse extends Response
         return response()->json($this->data);
     }
 
-    /**
-     * @return ZeroResponse
-     */
-    public function transform(): ZeroResponse
+    public function transform(): \ZeroController\Interfaces\Response
     {
         return $this;
     }
