@@ -113,6 +113,7 @@ class ZeroController extends Controller
     public function post(Request $request, int $item = null)
     {
         $request = $this->request;
+        $item = $this->model->find($item);
         try {
             if (!$item) {
                 $this->authorize($this->policy . 'create', $this->model);
