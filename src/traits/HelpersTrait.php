@@ -12,9 +12,8 @@ trait HelpersTrait
 {
     /**
      * @param Request $request
-     * @return HelpersTrait
      */
-    public function autoFill(Request $request): HelpersTrait
+    public function autoFill(Request $request)
     {
         $this->fill(array_filter($request->only($this->getFillable()), function ($key) use ($request) {
             return in_array($key, array_keys($request->all())) || @$this->getCasts()[$key] == 'boolean';

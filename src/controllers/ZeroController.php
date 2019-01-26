@@ -110,9 +110,10 @@ class ZeroController extends Controller
      * @param int|null $item
      * @return RedirectResponse|JsonResponse|RedirectResponse
      */
-    public function post(int $item = null)
+    public function post(Request $request, int $item = null)
     {
         $request = $this->request;
+        $item = $this->model->find($item);
         try {
             if (!$item) {
                 $this->authorize($this->policy . 'create', $this->model);
