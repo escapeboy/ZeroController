@@ -158,7 +158,7 @@ class ZeroController extends Controller
     public function delete(int $item)
     {
         /** @var Model $item */
-        $item = $this->model->firstOrFail($item);
+        $item = $this->model->findOrFail($item);
         $this->authorize($this->policy . 'delete', $item);
         $request = $this->request;
         try {
